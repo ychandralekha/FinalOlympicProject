@@ -11,8 +11,11 @@
 		<property name="connection.password">root</property>
 		<property name="show_sql">true</property>
 		<property name="dialet">org.hibernate.dialect.MySQLDialect</property>
-		<property name="hbm2ddl.auto">create </property>
+		<property name="hbm2ddl.auto">update</property>
 		<mapping class="com.cts.pojo.OlympicUserPojo" />
+		<mapping class="com.cts.pojo.OlympicHost"/>
+		<mapping class="com.cts.pojo.OlympicEventDiscipline"/>
+		<mapping class="com.cts.pojo.OlympicAthlete"/>
 	</session-factory>
 
 </hibernate-configuration>

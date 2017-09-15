@@ -50,7 +50,15 @@ public class OlympicController {
 			return "AdminWelcomePage";
 		else
 		{
-			//
+			boolean userResult=olympicService.validateUser(user);
+			System.out.println(userResult);
+			if(userResult==false)
+			{
+				model.clear();
+				model.addAttribute("user",new OlympicUserPojo());
+				return "Login";
+			}
+			else
 			return "UserLogin";
 		}
 	}
@@ -72,5 +80,10 @@ public class OlympicController {
 		model.addAttribute("register",register);
 		return "Login";
 	}
+	@RequestMapping(value="/Login",method=RequestMethod.GET)
+	public String logOutUser(Model model){
+		model.addAttribute("user", new OlympicUserPojo());
+       return "Login";  
+   }
 }
 

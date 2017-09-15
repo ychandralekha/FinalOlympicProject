@@ -22,6 +22,7 @@ private String role;
 private int status;
 private int display;
 
+
 public String getFirstName() {
 	return firstName;
 }
@@ -82,5 +83,12 @@ public String getPassword() {
 public void setPassword(String password) {
 	this.password = password;
 }
-
+@Override
+public String toString() {
+	return "OlympicUserPojo [username=" + username + ", password=" + password
+			+ ", firstName=" + firstName + ", lastName=" + lastName
+			+ ", datePicker=" + datePicker + ", email=" + email
+			+ ", phoneNumber=" + phoneNumber + ", role=" + role + ", status="
+			+ status + ", display=" + display + "]";
+}
 }

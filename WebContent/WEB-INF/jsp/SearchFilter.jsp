@@ -11,14 +11,14 @@
 <body>
 <h5>USER: ${userName}</h5>
 <h2 align="center">Hey ${userName}, Make your choice!</h2>
-<div class="logout"><a href="Login.jsp">LOG OUT</a></div>
+<div class="logout"><a href="Login">LOG OUT</a></div>
 <br>
 <br>
-<form action="OlympicUserOperationsServlet" method="post">
+<form action="/olympicGamesSpring/searchFilter" method="post">
     Enter the Start year:
-    <input type="text" name="year" value="" />
+    <input type="text" name="startyear" value="" />
     Enter the end year:
-     <input type="text" name="year" value="" />
+     <input type="text" name="endyear" value="" />
 <br><br>
     Enter the Athlete:
     <input type="text" name="athlete" value="" />
@@ -36,7 +36,7 @@
 <br>
 Select The Option to sort:
 <select name="sortingSelect" value="">
-<option value="year">Year</option>
+<option value="year">year</option>
 <option Value="medal">medal</option>
 <option value="country">Country</option>
 <option value="gender">Gender</option>
@@ -44,7 +44,7 @@ Select The Option to sort:
 </select>
 <br>
 <br>
-    <input type="submit" value="submit" name="searchPage">
+    <input type="submit" value="submit">
    <br>
    <br>
       <a href="UserLogin.jsp">BACK</a> <br>

@@ -1,119 +1,134 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%> 
+     <%@taglib uri = "http://www.springframework.org/tags/form" prefix = "form"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Adding a page</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript">
-function getDiscipline()
-{	
-	var sport=document.getElementById("sport").value;
-	window.location.href="http://localhost:8080/OlympicGamesSummer1/OlympicUserOperationsServlet?sport1="+sport+"&addpage=value";
-}
-function getEvent()
-{
-	var year=document.getElementById("year").value;
-	var sport=document.getElementById("sport").value;
-	var discipline=document.getElementById("discipline").value;
-	window.location.href="http://localhost:8080/OlympicGamesSummer1/OlympicUserOperationsServlet?sport="+sport+"&discipline="+discipline+"&actionevent=getdiscipline"+"&addpage=value";
-}
+$(document).ready(
+			function() {
+				$('#sport').change(
+						function(event) {
+							alert('entered');
+							var sportvalue = $("select#sport").val();
+							$.get('getdiscipline', {
+								sportName : sportvalue
+							}, function(response) {
+								var select = $('#discipline');
+								select.find('option').remove();
+								var select1 = $('#event');
+								select1.find('option').remove();
+								$('<option>').val("").text(
+										"Select").appendTo(
+												select);
+								$.each(response, function(index, value) {
+									$('<option>').val(value).text(
+											value).appendTo(
+											select);
+								});
+							});
+						});
+				$('#discipline').change(
+						function(event) {
+							alert('entered');
+							var disciplinevalue = $("select#discipline").val();
+							var sportvalue = $("select#sport").val();
+							$.get('getevent', {
+								disciplineName : disciplinevalue,
+								sportName : sportvalue
+							}, function(response) {
+								var select = $('#event');
+								select.find('option').remove();
+								$('<option>').val("").text(
+								"select event").appendTo(
+										select);
+								$.each(response, function(index, value) {
+									$('<option>').val(value).text(
+											value).appendTo(
+											select);
+								});
+							});
+						});
+
+			});
 </script>
 </head>
 <body>
 <h5>USER: ${userName}</h5>
 <h2 align="center">Hi ${userName}, Let's fill in the details to add.</h2>
 <div class="logout"><a href="Login">LOG OUT</a></div>
-<form action="OlympicUserOperationsServlet" method="post">
+<form:form action="/olympicGamesSpring/addingPage" method="post" modelAttribute="add">
 <table  cellspacing="10" cellpadding="10">
-
+<tr>
 <td>Select Sport</td><td>
-<select name="sportselect" id="sport" onchange="getDiscipline()" >
-<option  >Select</option>
-               <c:forEach items="${sportList}" var="out">
-               <c:choose>
-               <c:when test="${out.key==sport}">
-               <option value="${out.key}" selected="selected" >${out.key}</option>
-               </c:when>
-               <c:otherwise>
-               <option value="${out.key}" >${out.key}</option>
-               </c:otherwise>
-               </c:choose>
-      			 
-      		 </c:forEach> 
-</select></td>
+<form:select path="sport" id="sport">
+<form:option value="NONE" label="select">Select</form:option>
+               <form:options items="${sportList}"/>
+</form:select></td>
 </tr>
 <tr>
 <td>Select Discipline</td><td>
-<select name="disciplineselect" id="discipline" onchange="getEvent()">
-<option >Select</option>
-               <c:forEach items="${disciplineList}" var="out">
-               <c:choose>
-               <c:when test="${out==discipline}">
-               <option value="${out}" selected="selected" >${out}</option>
-               </c:when>
-               <c:otherwise>
-               <option value="${out}" >${out}</option>
-               </c:otherwise>
-               </c:choose>
-      		 </c:forEach>
-</select></td>
+<form:select path="discipline" id="discipline">
+<form:option value="NONE" label="select">Select</form:option>
+               <form:options items="${disciplineList}"/>
+</form:select>
+</td>
 <tr>
 <td>Select Event</td><td>
-<select name="eventselect" >
-<option >Select</option>
-               <c:forEach items="${eventList}" var="out">
-      			 <option value="${out}" >${out}</option>
-      			 </c:forEach>
-</select></td>
+<form:select path="event" id="event">
+<form:option value="NONE" label="select">Select</form:option>
+               <form:options items="${eventList}" />
+               </form:select>
+      			</td>
 
-</tr>
 </tr>
 <tr>
 <td>Select Year</td><td>
-<select name="yearselect" id="year" onchange="getCity()" >
-<option selected="selected" >Select</option>
-               <c:forEach items="${yearList}" var="out">
-               <option value="${out}" >${out.key}-${out.value}</option>
-      		 </c:forEach> 
-</select></td>
+<form:select path="year" id="year">
+               <form:options items="${host}" itemValue="year" />
+               </form:select></td>
 </tr>
 <tr>
 <tr><td>Athlete
 </td>
-<td><input type="text" name="athlete"/>
+<td>
+<form:input path="athlete"/>
 </td></tr>
 <tr>
 <td>Select Country</td><td>
-<select name="countryselect" >
-<option  selected="selected"  value="" >Select</option>
-               <c:forEach items="${countryList}" var="out">
-      			 <option value="${out}" >${out}</option>
-      		 </c:forEach> 
-</select></td>
+<form:select path="country" id="country">
+<form:option value="NONE" label="select">Select</form:option>
+               <form:options items="${countryList}" />
+               </form:select></td>
 </tr>
 <tr>
 <td>Select Gender</td><td>
-<select name="genderselect" >
-<option value="Men">Men</option>
-<option value="Women">Women</option>
-</select></td>
+<form:select path="gender">
+<form:option value="NONE" label="select"/>
+<form:option value="Men"/>
+<form:option value="Women"/>
+</form:select></td>
 </tr>
 
 <tr>
 <td>Select Medal</td><td>
-<select name="medalselect" >
-<option value="gold">Gold</option>
-<option value="silver">Silver</option>
-<option value="Bronze">Bronze</option>
-</select></td>
+<form:select path="medal">
+<form:option value="NONE" label="select"/>
+<form:option value="Gold"/>
+<form:option value="Silver"/>
+<form:option value="Bronze"/>
+</form:select></td>
+
 </tr>
 <tr>
 <td><input type="submit" value="submit" name="addPage"/>
 </td></tr>   
            <tr><td><br><a href="UserLogin">BACK</a></td></tr>
 </table>
-</form>
+</form:form>
 </body>
 </html>

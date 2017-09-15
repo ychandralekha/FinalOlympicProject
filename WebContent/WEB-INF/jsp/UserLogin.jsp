@@ -13,7 +13,7 @@
 <div class="header">
 <h2 align="center">Hey ${userName}! What do you want to do today?</h2>
 </div>
-<div class="logout"><a href="Login.jsp">LOG OUT</a></div>
+<div class="logout"><a href="Login">LOG OUT</a></div>
 
 <form action="/olympicGamesSpring/userLogin" method="POST">
 <table cellspacing="10" cellpadding="10">
@@ -41,7 +41,7 @@
 <td> Search and filter.
 </td>
 </tr>
-<tr><td><input type="submit" value="submit" name="userLogin"/></td></tr>
+<tr><td><input type="submit" value="submit" /></td></tr>
 </table>
 </form>
 

@@ -46,7 +46,7 @@
 <body background="images\olympic.jpg">
 <h2 align="center">Registration Page</h2>
 <h3 style="color:red">${error}</h3>
-<h6 align="center"><a href="Login.jsp">EXISTING USER? LOG IN!</a></h6>
+<h6 align="center"><a href="Login">EXISTING USER? LOG IN!</a></h6>
 
 <form:form method="post" action="OlympicControllerRegister"  modelAttribute="register" onsubmit="return validateForm();">
 

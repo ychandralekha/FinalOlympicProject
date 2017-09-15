@@ -8,8 +8,9 @@ import org.springframework.stereotype.Component;
 @Component("sessionFactory")
 public class SessionFactoryProvider {
 	public static SessionFactory factory;
-
-	public  SessionFactory sessionFactory() {
+	private SessionFactoryProvider() {
+	}
+	public static  SessionFactory sessionFactory() {
 		if(factory==null)
 		{
 		Configuration configuration = new Configuration().configure();
