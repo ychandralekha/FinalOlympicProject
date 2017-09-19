@@ -2,15 +2,18 @@ package com.cts.util;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.cts.pojo.SearchFilter;
 
 public class SearchList {
+	public static final Logger LOG=Logger.getLogger(SearchList.class);
 	public SearchFilter retrieveFilterObject(Map<String, String>record)
 	{
+		LOG.info("search filter map to pojo..");
 		SearchFilter olympicRecord=new SearchFilter();
 		if(record.get("startyear").isEmpty() || record.get("endyear").isEmpty())
 		{
-			System.out.println("year......");
 			olympicRecord.setStartYear(0);
 			olympicRecord.setEndYear(0);
 		}
@@ -24,7 +27,6 @@ public class SearchList {
 		olympicRecord.setCountry(record.get("country"));
 		olympicRecord.setGender(record.get("gender"));
 		olympicRecord.setSortSelect(record.get("sortingSelect"));
-		System.out.println(olympicRecord);
 		return olympicRecord;
 		
 	}

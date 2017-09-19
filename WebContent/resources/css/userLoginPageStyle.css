@@ -1,0 +1,24 @@
+@CHARSET "ISO-8859-1";
+.header {
+    background-color: #b9936c;
+    color: #ffffff;
+    padding: 10px;
+}
+h2 {
+    font-family: georgia;
+     font-style: italic;
+  font-size: 30px;
+     
+}
+td{
+font-variant: small-caps;
+}
+body{
+  background: url("../images/london.jpg") no-repeat;
+	background-size:cover;
+	background-attachment: fixed;
+}
+
+.logout{
+	float:right;
+}

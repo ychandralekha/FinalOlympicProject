@@ -5,6 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link href="${pageContext.request.contextPath}/resources/css/LoginStyle.css" rel="stylesheet" type="text/css" /> 
 <title>Login page</title>
 
 </head>

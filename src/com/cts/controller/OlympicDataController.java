@@ -1,13 +1,14 @@
 package com.cts.controller;
 
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.cts.exception.OlympicException;
 import com.cts.file.FileParse;
 import com.cts.pojo.OlympicDataPojo;
 import com.cts.pojo.OlympicUserPojo;
@@ -27,7 +29,7 @@ import com.cts.util.SearchList;
 
 @Controller
 public class OlympicDataController {
-
+	public static final Logger LOG=Logger.getLogger(OlympicDataController.class);
 @RequestMapping(value="/userLogin", method = RequestMethod.POST)
 public String userPage(HttpServletRequest request,HttpServletResponse response,ModelMap model)
 {
@@ -51,6 +53,7 @@ public String userPage(HttpServletRequest request,HttpServletResponse response,M
 	{
 		pageDirect= "SearchFilter";
 	}
+	LOG.info("page redirect to "+pageDirect);
 	return pageDirect;
 }
 
@@ -78,7 +81,7 @@ public String validateUserRegisteration(@RequestParam("approve")String[] approve
 		pageDirect="AdminApprovalPage";
 	else
 		pageDirect="AdminWelcomePage";
-	
+	LOG.info("Admin operations");
 	return pageDirect;
 }
 
@@ -89,16 +92,21 @@ public String handleFileUpload(HttpServletRequest request,
 		 List<OlympicDataPojo>list=file.parseData(fileUpload);
 		OlympicService olympicService=new OlympicService();
 		olympicService.upload(list);
+		LOG.info("After upload");
 			return "AdminWelcomePage";
     }
 @RequestMapping(value = "/addingPage", method = RequestMethod.POST)
-public String afterPopulating(@ModelAttribute("add")OlympicDataPojo olympicData)
+public String afterPopulating(@ModelAttribute("add")OlympicDataPojo olympicData,HttpServletRequest request)
 {
-	
-	System.out.println("add page");
-	System.out.println(olympicData);
+	LOG.info("Adding Page");
 	OlympicService olympicService=new OlympicService();
-	olympicService.insertRecord(olympicData);
+	try {
+		olympicService.insertRecord(olympicData);
+	} catch (OlympicException e) {
+		request.setAttribute("error",e);
+		
+		e.printStackTrace();
+	}
 	return "UserLogin";
 	
 } 
@@ -106,13 +114,12 @@ public String afterPopulating(@ModelAttribute("add")OlympicDataPojo olympicData)
 @RequestMapping(value = "/updatePage", method = RequestMethod.POST)
 public String updateOperation(@ModelAttribute("add")OlympicDataPojo olympicData,ModelMap model)
 {
+	LOG.info("Update Page");
 	OlympicService olympicService=new OlympicService();
 	model.addAttribute("host",olympicService.retrieveHost());
 	model.addAttribute("countryList",olympicService.retrieveAthleteList());
 	model.addAttribute("sportList",olympicService.retrieveSport());
 	model.addAttribute("add", new OlympicDataPojo());
-	System.out.println("update page");
-	System.out.println(olympicData);
 	List<OlympicDataPojo>disp=olympicService.displayRecord(olympicData);
 	//OlympicAthletes athletes=new OlympicAthletes();
 	//athletes.setAthletes(disp);
@@ -140,23 +147,21 @@ public @ResponseBody List<String> populateEvent(@RequestParam("sportName")String
 }
 
 @RequestMapping(value = "/editDeletePage", method = RequestMethod.POST)
-public String editDeleteOperation(ModelMap model,@RequestParam Map<String, String> record)
+public String editDeleteOperation(ModelMap model,@RequestParam Map<String, String> record,HttpServletRequest request)
 {
-	System.out.println("...."+record);
+	LOG.info("Edit or delete page");
 	MapRetrieve mapData=new MapRetrieve();
 	OlympicDataPojo olympicData=new OlympicDataPojo();
 	olympicData=mapData.retrieveObject(record);
-	System.out.println(olympicData);
 	OlympicService olympicService=new OlympicService();
 	model.addAttribute("host",olympicService.retrieveHost());
 	model.addAttribute("countryList",olympicService.retrieveAthleteList());
 	model.addAttribute("sportList",olympicService.retrieveSport());
-	System.out.println("edit delete page");
 	String oldathlete;
 	oldathlete=record.get("edit");
 	String deleteAthlete=record.get("delete");
 	List<OlympicDataPojo>updatedList;
-
+try{
 	if(oldathlete!=null && !oldathlete.isEmpty())
 	{
 		String newAthlete=record.get(oldathlete);
@@ -168,6 +173,10 @@ public String editDeleteOperation(ModelMap model,@RequestParam Map<String, Strin
 	}
 	model.addAttribute("displayList",updatedList);
 	model.addAttribute("add", new OlympicDataPojo());
+}catch(OlympicException e)
+{
+	request.setAttribute("error", e);
+}
 	return "UpdatePage";	
 } 
 @RequestMapping(value = "/searchFilter", method = RequestMethod.POST)
@@ -177,15 +186,26 @@ public String searchRecord(ModelMap model,@RequestParam Map<String, String> reco
 	OlympicService olympicService=new OlympicService();
 	SearchList searchList=new SearchList();
 	SearchFilter filterRecord=searchList.retrieveFilterObject(record);
-	model.addAttribute("fullQuery",olympicService.searchFilterRecord(filterRecord));
+	HttpSession session=request.getSession();
+	session.setAttribute("fullQuery", olympicService.searchFilterRecord(filterRecord));
+	//model.addAttribute("fullQuery",olympicService.searchFilterRecord(filterRecord));
 	return "DownloadFilteredRecord";
 }
 @RequestMapping(value="/download", method = RequestMethod.POST)
-public String downloadRecord(@RequestParam("fullQuery")List<OlympicDataPojo>filteredData)
+public String downloadRecord(HttpServletRequest request)
 {
+	LOG.info("Download the records");
+	HttpSession session=request.getSession();
+	List<OlympicDataPojo>filteredData=(List<OlympicDataPojo>)session.getAttribute("fullQuery");
 	OlympicService olympicService=new OlympicService();
-	olympicService.filterDisplay(filteredData);
-    return "DownloadFilteredRecord";
+	try {
+		olympicService.filterDisplay(filteredData);
+	} catch (OlympicException e) {
+		request.setAttribute("error",e);
+	}
+	session.removeAttribute("fullQuery");
+    return "SearchFilter";
 	
 }
+
 }

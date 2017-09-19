@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -14,104 +15,25 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import com.cts.exception.OlympicException;
 import com.cts.pojo.OlympicAthlete;
 import com.cts.pojo.OlympicDataPojo;
 import com.cts.pojo.OlympicEventDiscipline;
 import com.cts.pojo.OlympicHost;
-import com.cts.pojo.OlympicUserPojo;
 import com.cts.pojo.SearchFilter;
 import com.cts.util.PojoToPojo;
 
-public class OlympicDaoImplementation extends AbstractFactory {
-
-	public static String registerLoading(OlympicUserPojo olympicObject) {
-		String result;
-		SessionFactory factory=getFactory();
-		Session session=factory.openSession();
-		olympicObject.setStatus(0);
-		olympicObject.setDisplay(1);
-		olympicObject.setRole("user");
-		
-		Transaction transaction =session.beginTransaction();
-		session.save(olympicObject);
-
-		
-		try{
-		transaction.commit();
-		result="success";
-		}catch(Exception e){
-			olympicObject.setUsername("");
-			session.close();
-			result="failure";
-			e.printStackTrace();
-		}
-		return result;
-	}
-	
-	
-	public static boolean userValidation(OlympicUserPojo olympicObject)
-	{
-		boolean result;
-
-		SessionFactory factory=getFactory();
-		Session session=factory.openSession();
-		Transaction transaction=session.beginTransaction();
-		Query query=session.createQuery("from OlympicUserPojo where username= :username");
-		query.setParameter("username",olympicObject.getUsername());
-		try{
-		OlympicUserPojo userObject=(OlympicUserPojo)query.uniqueResult();
-		
-		System.out.println(userObject);
-		if(userObject.getStatus()==0)
-		result=false;
-		else
-			result=true;
-		}
-		catch(Exception e)
-		{
-			result=false;
-		session.close();
-		factory.close();
-		
-		}
-		return result;
-	}
-
-
-	public static boolean approveUser(String[] users) {
-		// TODO Auto-generated method stub
-		boolean result=false;
-		SessionFactory factory=getFactory();
-		Session session=factory.openSession();
-		Transaction transaction=session.beginTransaction();
-		for(String user:users)
-		{
-			Criteria criteria=session.createCriteria(OlympicUserPojo.class).add(Restrictions.eq("username", user));
-			OlympicUserPojo olympicObj=(OlympicUserPojo)criteria.list().get(0);
-			olympicObj.setStatus(1);
-		}
-		transaction.commit();
-		result=true;
-		return result;
-	}
-
-	public static List<OlympicUserPojo> displayUsers() {
-		SessionFactory factory=getFactory();
-		Session session=factory.openSession();
-		Query query=session.createQuery("from OlympicUserPojo where status=0");
-		List<OlympicUserPojo>users=query.list();
-		return users;
-	}
-
-
-	public static boolean uploadData( List<OlympicDataPojo> file) {
+public class OlympicDaoImplementation extends AbstractFactory implements IUserOperations{
+ 
+	public static final Logger LOG=Logger.getLogger(OlympicDaoImplementation.class);
+	public boolean uploadData( List<OlympicDataPojo> file) throws OlympicException {
 		
 		Set<String>eventList=new HashSet<String>();
 		Set<String>hostList=new HashSet<String>();
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
 		PojoToPojo copynewPojo=new PojoToPojo();
-
+		try{
 		for(OlympicDataPojo record :file)
 		{
 			Transaction transaction1=session.beginTransaction();
@@ -130,62 +52,66 @@ public class OlympicDaoImplementation extends AbstractFactory {
 			eventList.add(event.getDiscipline()+" "+event.getEvent()+" "+event.getSport());
 			hostList.add(host.getCity()+" "+host.getYear());
 			
-			System.out.println(eventList.size());
 			
 			if(eventList.size()==eventSize)
 			{
-				System.out.println("event.....");
+				
 				Criteria criteria=session.createCriteria(OlympicEventDiscipline.class).add(Restrictions.eq("sport",record.getSport())).add(Restrictions.eq("discipline",record.getDiscipline())).add(Restrictions.eq("event", record.getEvent()));
 				OlympicEventDiscipline event1=(OlympicEventDiscipline) criteria.list().get(0);
-				System.out.println(event1.getEventId()+"  "+event1.getDiscipline());
+				
 				event1.getAthleteList().add(athlete);
 				athlete.setEventObject(event1);
-				System.out.println(athlete.getAthlete());
+			
 			}
 			else
 			{
 				event.getAthleteList().add(athlete);
 				session.save(event);
 				athlete.setEventObject(event);
-				System.out.println(athlete.getAthlete());
+				
 			}
 			if(hostList.size()==hostSize)
 			{
-				System.out.println("host....");
+				
 				Criteria criteria=session.createCriteria(OlympicHost.class).add(Restrictions.eq("year",host.getYear())).add(Restrictions.eq("city",host.getCity()));
 				host=(OlympicHost) criteria.list().get(0);
 				host.getAthleteList().add(athlete);
 				athlete.setHostObject(host);
-				System.out.println(host.getYear());
+			
 			}
 			else
 			{
 				host.getAthleteList().add(athlete);
 				session.save(host);
 				athlete.setHostObject(host);
-				System.out.println(athlete.getAthlete());
-				System.out.println(host.getCity());
+			
 			}
 			session.save(athlete);
 			transaction1.commit();
 		}
-		
+		}
+		catch(Exception e)
+		{
+			LOG.info("Upload Fail");
+			throw new OlympicException("Upload Fail");
+		}
 		
 		session.close();
 		return false;
 	}
 
 
-	public static List<OlympicHost> retrieveHostList() {
-		
+	public List<OlympicHost> retrieveHostList() {
+		LOG.info("retriving host list");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
 		Query query=session.createQuery("from OlympicHost");
 		List<OlympicHost>hostList=query.list();
 		return hostList;
 	}
-	public static Set<String> retrieveAthleteList()
+	public Set<String> retrieveAthleteList()
 	{
+		LOG.info("retriving athlete list");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
 		Query query=session.createQuery("select country from OlympicAthlete");
@@ -195,7 +121,8 @@ public class OlympicDaoImplementation extends AbstractFactory {
 		countryList.addAll(athleteList);
 		return countryList;
 	}
-	public static Set<String> retrieveSportList() {
+	public Set<String> retrieveSportList() {
+		LOG.info("retriving sport list");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
 		Query query=session.createQuery("select sport from OlympicEventDiscipline");
@@ -204,7 +131,8 @@ public class OlympicDaoImplementation extends AbstractFactory {
 		sportSet.addAll(sportList);
 		return sportSet;
 	}
-	public static Set<String> retrieveDisciplineList(String sport) {
+	public Set<String> retrieveDisciplineList(String sport) {
+		LOG.info("retriving discipline list");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
 		Query query=session.createQuery("select discipline from OlympicEventDiscipline where sport= :sport");
@@ -212,10 +140,10 @@ public class OlympicDaoImplementation extends AbstractFactory {
 		List<String>disciplineList=query.list();
 		Set<String>disciplineSet=new HashSet<String>();
 		disciplineSet.addAll(disciplineList);
-		System.out.println(disciplineSet.size());
 		return disciplineSet;
 	}
-	public static Set<String> retrieveEventList(String sport,String discipline) {
+	public Set<String> retrieveEventList(String sport,String discipline) {
+		LOG.info("retriving event list");
 		System.out.println("sport disp entered");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
@@ -225,12 +153,12 @@ public class OlympicDaoImplementation extends AbstractFactory {
 		List<String>eventList=query.list();
 		Set<String>eventSet=new HashSet<String>();
 		eventSet.addAll(eventList);
-		System.out.println(eventSet.size());
 		return eventSet;
 	}
 
 
-	public static boolean insertUserRecord(OlympicDataPojo record) {
+	public boolean insertUserRecord(OlympicDataPojo record) throws OlympicException {
+		LOG.info("adding record");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
 		OlympicAthlete athlete=new OlympicAthlete();
@@ -239,9 +167,9 @@ public class OlympicDaoImplementation extends AbstractFactory {
 		OlympicEventDiscipline event=new OlympicEventDiscipline();
 		copyObject.copyObject(record, event);
 		OlympicHost host=new OlympicHost();
-		System.out.println(record);
 
-		
+		try
+		{
 		Query query=session.createQuery("select eventId from OlympicEventDiscipline where sport=:sport and discipline=:discipline and event=:event");
 		query.setParameter("sport",record.getSport());
 		query.setParameter("discipline", record.getDiscipline());
@@ -257,13 +185,18 @@ public class OlympicDaoImplementation extends AbstractFactory {
 		session.save(athlete);
 		Transaction transaction=session.beginTransaction();
 		transaction.commit();
-		
+		}
+		catch(Exception e)
+		{
+			throw new OlympicException("Adding record failed!");
+		}
 		
 		return true;
 	}
 
 
-	public static List<OlympicDataPojo> displayUserRecord(OlympicDataPojo record) {
+	public List<OlympicDataPojo> displayUserRecord(OlympicDataPojo record) {
+		LOG.info("display user record");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
 		OlympicAthlete athlete=new OlympicAthlete();
@@ -305,7 +238,8 @@ public class OlympicDaoImplementation extends AbstractFactory {
 		return displayList;
 	}
 
-	public static List<OlympicDataPojo> updateRecords(OlympicDataPojo record, String name,String operation) {
+	public List<OlympicDataPojo> updateRecords(OlympicDataPojo record, String name,String operation) throws OlympicException {
+		LOG.info("update the records");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
 		OlympicAthlete athlete=new OlympicAthlete();
@@ -314,8 +248,8 @@ public class OlympicDaoImplementation extends AbstractFactory {
 		OlympicEventDiscipline event=new OlympicEventDiscipline();
 		copyObject.copyObject(record, event);
 		OlympicHost host=new OlympicHost();
-		
-		System.out.println(name+" : "+operation);
+		try{
+			
 		Query query=session.createQuery("select eventId from OlympicEventDiscipline where sport=:sport and discipline=:discipline and event=:event");
 		query.setParameter("sport",record.getSport());
 		query.setParameter("discipline", record.getDiscipline());
@@ -366,13 +300,17 @@ public class OlympicDaoImplementation extends AbstractFactory {
 			record.setAthlete(olympicAthlete.getAthlete());
 			athleteName.add(record);
 		}
-		athleteName.forEach(System.out::println);
-		
 		return athleteName;
+	}
+	catch(Exception e)
+	{
+		throw new OlympicException("Update record failed!");
+	}
 	}
 
 
-	public static List<OlympicDataPojo> searchFilterList(SearchFilter record) {
+	public List<OlympicDataPojo> searchFilterList(SearchFilter record) {
+		LOG.info("search and filter to get a list");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
 		OlympicAthlete athlete=new OlympicAthlete();
@@ -384,18 +322,15 @@ public class OlympicDaoImplementation extends AbstractFactory {
 		
 	
 
-Criteria cr = session.createCriteria(OlympicAthlete.class,"athlete").createAlias("athlete.eventObject","event");
-		
-		if((record.getStartYear()!=0)&&(record.getEndYear()!=0))
-		{
-			cr.add(Restrictions.between("hostObject.year", record.getStartYear(), record.getEndYear()));
-		}
-	
+		Criteria cr = session.createCriteria(OlympicAthlete.class,"athlete").createAlias("athlete.eventObject","event");
+			if((record.getStartYear()!=0)&&(record.getEndYear()!=0))
+			{
+				cr.add(Restrictions.between("hostObject.year", record.getStartYear(), record.getEndYear()));
+			}
 			if(!(record.getCountry()).isEmpty())
 			{
 				cr.add(Restrictions.like("country", record.getCountry()+"%"));
 			}
-			
 			if(!(record.getAthlete()).isEmpty())
 			{
 				cr.add(Restrictions.like("athlete", record.getAthlete()+"%"));
@@ -408,7 +343,7 @@ Criteria cr = session.createCriteria(OlympicAthlete.class,"athlete").createAlias
 			{
 				cr.add(Restrictions.like("athlete.gender", record.getGender()+"%"));
 			}
-			System.out.println(record.getSortSelect());
+			cr.add(Restrictions.eq("athlete.display", "1"));
 			if(!record.getSortSelect().equalsIgnoreCase("year"))
 			{
 				    cr.addOrder(Order.asc(record.getSortSelect()));
@@ -417,9 +352,7 @@ Criteria cr = session.createCriteria(OlympicAthlete.class,"athlete").createAlias
 			{
 				cr.createCriteria("hostObject").addOrder(Order.asc("year"));
 			}
-			//System.out.println("query.... "+cr.list().size());
 			List<OlympicAthlete> results = cr.list();
-			
 			List<OlympicDataPojo>finalResult=new ArrayList<OlympicDataPojo>();
 			for(OlympicAthlete search:results)
 			{
@@ -437,9 +370,9 @@ Criteria cr = session.createCriteria(OlympicAthlete.class,"athlete").createAlias
 			}
 		return finalResult;
 	}
-
-		public static boolean filterDisplayRecord(List<OlympicDataPojo>filteredData)
+		public boolean filterDisplayRecord(List<OlympicDataPojo>filteredData) throws OlympicException
 	    {
+			LOG.info("download the file");
 		   boolean result=false;
 	    	try
 	    	{
@@ -452,8 +385,10 @@ Criteria cr = session.createCriteria(OlympicAthlete.class,"athlete").createAlias
 		           result=true;
 		           fw.close();
 	    	}
-	    	catch(Exception e){System.out.println(e);}   
-	    	System.out.println("Success...");
+	    	catch(Exception e){  
+	    		LOG.info("download failed");
+	    		throw new OlympicException("Download Failed");}   
 	        return result;
+	      
 	    }
 }

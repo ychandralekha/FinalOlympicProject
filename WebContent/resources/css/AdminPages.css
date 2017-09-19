@@ -1,0 +1,25 @@
+@CHARSET "ISO-8859-1";
+body{
+  background:url("../images/rings.jpg") no-repeat;
+	background-size:cover;
+	background-position: top;
+	background-attachment: fixed;
+}
+h2 {
+    font-family: georgia;
+     font-style: italic;
+  font-size: 30px;
+  color:white;
+     
+}
+td,table,h4{
+font-variant: small-caps;
+color:white;
+}
+.logout{
+float:right;
+color:white;	
+}
+h5{
+	color:white;
+}

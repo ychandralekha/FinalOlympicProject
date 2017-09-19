@@ -6,6 +6,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link href="${pageContext.request.contextPath}/resources/css/userLoginPageStyle.css" rel="stylesheet" type="text/css" /> 
 <title>Updating a page</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript">
@@ -13,7 +14,6 @@ $(document).ready(
 			function() {
 				$('#sport').change(
 						function(event) {
-							alert('entered');
 							var sportvalue = $("select#sport").val();
 							$.get('getdiscipline', {
 								sportName : sportvalue
@@ -34,7 +34,6 @@ $(document).ready(
 						});
 				$('#discipline').change(
 						function(event) {
-							alert('entered');
 							var disciplinevalue = $("select#discipline").val();
 							var sportvalue = $("select#sport").val();
 							$.get('getevent', {
@@ -174,7 +173,7 @@ function deleteFunction(athlete)
         </c:forEach> 
         <br>
            
-           <tr><td><a href="UserLogin.jsp">BACK</a></td></tr>
+           <tr><td><a href="UserLogin">BACK</a></td></tr>
            <br>
 
             

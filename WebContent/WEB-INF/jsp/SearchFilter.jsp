@@ -5,6 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link href="${pageContext.request.contextPath}/resources/css/userLoginPageStyle.css" rel="stylesheet" type="text/css" /> 
 <title>Search and Filter page</title>
 </head>
 
@@ -47,7 +48,7 @@ Select The Option to sort:
     <input type="submit" value="submit">
    <br>
    <br>
-      <a href="UserLogin.jsp">BACK</a> <br>
+      <a href="UserLogin">BACK</a> <br>
       <br>
 </form>    
 </body>

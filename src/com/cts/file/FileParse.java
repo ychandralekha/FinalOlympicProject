@@ -7,14 +7,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import com.cts.pojo.OlympicDataPojo;
 
 public class FileParse {
+	public static final Logger LOG=Logger.getLogger(FileParse.class);
 	public List<OlympicDataPojo> parseData(String path) throws Exception  {
+		LOG.info("file parsing");
 		List<OlympicDataPojo>fileData=new ArrayList<OlympicDataPojo>();
 		BufferedReader bufferedReader=new BufferedReader(new FileReader(path));
 		bufferedReader.readLine();
-		int count=0;
 		String record;
 		try {
 			
@@ -38,9 +41,7 @@ public class FileParse {
 			{
 				s.add(odp.getAthlete());
 			}
-			//s.forEach(System.out::println);
-			System.out.println(s.size());
-			System.out.println(fileData.size());
+			LOG.info("upload done with ...."+s.size());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
