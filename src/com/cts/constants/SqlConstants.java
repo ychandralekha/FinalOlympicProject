@@ -12,4 +12,6 @@ public static final String selectCity="select city from OlympicHost where year=:
 public static final String updateAthlete="update OlympicAthlete set display=:display where athlete=:athlete and eventId=:eventId and country=:country and gender=:gender and medal=:medal and year=:year";
 public static final String updateSetAthlete ="update OlympicAthlete set athlete=:athlete where athlete=:oldathlete and eventId=:eventId and country=:country and gender=:gender and medal=:medal and year=:year and display=:display";
 public static final String fromAthlete="from OlympicAthlete where eventId=:eventId and country=:country and gender=:gender and medal=:medal and year=:year and display=:display";
+public static final String fromUser="from OlympicUserPojo where username=:username and password=:password and status=:status";
+public static final String fromUserPojo="from OlympicUserPojo where status=0";
 }

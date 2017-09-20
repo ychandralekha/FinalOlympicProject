@@ -9,17 +9,17 @@ h2 {
     font-family: georgia;
      font-style: italic;
   font-size: 30px;
-  color:white;
+  color:black;
      
 }
 td,table,h4{
 font-variant: small-caps;
-color:white;
+color:black;
 }
 .logout{
 float:right;
-color:white;	
+color:black;	
 }
 h5{
-	color:white;
+	color:black;
 }

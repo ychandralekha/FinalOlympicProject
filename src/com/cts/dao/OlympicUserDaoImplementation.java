@@ -10,6 +10,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
+import com.cts.constants.SqlConstants;
 import com.cts.exception.OlympicException;
 import com.cts.pojo.OlympicUserPojo;
 
@@ -43,11 +44,11 @@ public class OlympicUserDaoImplementation extends AbstractFactory implements IUs
 	public boolean userValidation(OlympicUserPojo olympicObject) throws OlympicException
 	{
 		boolean result;
-LOG.info("user validation");
+		LOG.info("user validation");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
 		Transaction transaction=session.beginTransaction();
-		Query query=session.createQuery("from OlympicUserPojo where username=:username and password=:password and status=:status");
+		Query query=session.createQuery(SqlConstants.fromUser);
 		query.setParameter("username",olympicObject.getUsername());
 		query.setParameter("password", olympicObject.getPassword());
 		query.setParameter("status",1);
@@ -93,7 +94,7 @@ LOG.info("user validation");
 		LOG.info("display users");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
-		Query query=session.createQuery("from OlympicUserPojo where status=0");
+		Query query=session.createQuery(SqlConstants.fromUserPojo);
 		List<OlympicUserPojo>users=query.list();
 		return users;
 	}
