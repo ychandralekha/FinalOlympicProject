@@ -9,17 +9,19 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.cts.exception.OlympicException;
 import com.cts.pojo.OlympicDataPojo;
 
 public class FileParse {
 	public static final Logger LOG=Logger.getLogger(FileParse.class);
-	public List<OlympicDataPojo> parseData(String path) throws Exception  {
+	public List<OlympicDataPojo> parseData(String path) throws OlympicException {
 		LOG.info("file parsing");
 		List<OlympicDataPojo>fileData=new ArrayList<OlympicDataPojo>();
+		try {
 		BufferedReader bufferedReader=new BufferedReader(new FileReader(path));
 		bufferedReader.readLine();
 		String record;
-		try {
+	
 			
 			while((record=bufferedReader.readLine())!=null)
 			{
@@ -42,10 +44,11 @@ public class FileParse {
 				s.add(odp.getAthlete());
 			}
 			LOG.info("upload done with ...."+s.size());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		
 		bufferedReader.close();
+		} catch (Exception e) {
+			throw new OlympicException("Upload a valid file");
+		}
 		return fileData;
 	}
 }

@@ -31,7 +31,7 @@
 <br>
 <br>
 <br>
-<a style="color:white" href="AdminWelcomePage">BACK</a>
+<a  href="AdminWelcomePage">BACK</a>
 </form:form>
 
 </body>
