@@ -31,7 +31,7 @@ function S_click(){
 <td><form:input path="username"/>
 <form:errors path="username"  cssClass="error"/></td></tr>
 <tr><td>Password: </td>
-<td><form:input path="password" />
+<td><form:password path="password" />
 <form:errors path="password"  cssClass="error"/></td></tr>
 <tr><td><input type="submit" value="Submit" onclick="return S_click();"></td></tr>
 </table>

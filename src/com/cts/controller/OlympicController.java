@@ -92,11 +92,11 @@ public class OlympicController {
 		{
 			return "RegisterPage";
 		}
-		String registerResult;
-		try {
-			registerResult = olympicService.registerDetails(register);
 		
-		System.out.println(registerResult);
+		try {
+		
+			olympicService.registerDetails(register);
+		
 		} catch (OlympicException e) {
 			request.setAttribute("error", e);
 		}
@@ -115,6 +115,11 @@ public class OlympicController {
 	public String backToUserLogin()
 	{
 	       return "UserLogin"; 
+	}
+	@RequestMapping(value="AdminWelcomePage",method=RequestMethod.GET)
+	public String backToAdminLogin()
+	{
+	       return "AdminWelcomePage"; 
 	}
 }
 

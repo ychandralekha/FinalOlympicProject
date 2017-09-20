@@ -15,6 +15,7 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import com.cts.constants.SqlConstants;
 import com.cts.exception.OlympicException;
 import com.cts.pojo.OlympicAthlete;
 import com.cts.pojo.OlympicDataPojo;
@@ -105,7 +106,7 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 		LOG.info("retriving host list");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
-		Query query=session.createQuery("from OlympicHost");
+		Query query=session.createQuery(SqlConstants.olympicHost);
 		List<OlympicHost>hostList=query.list();
 		return hostList;
 	}
@@ -114,7 +115,7 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 		LOG.info("retriving athlete list");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
-		Query query=session.createQuery("select country from OlympicAthlete");
+		Query query=session.createQuery(SqlConstants.selectCountryQuery);
 		List<String>athleteList=query.list();
 		Set<String>countryList=new HashSet<String>();
 		
@@ -125,7 +126,7 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 		LOG.info("retriving sport list");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
-		Query query=session.createQuery("select sport from OlympicEventDiscipline");
+		Query query=session.createQuery(SqlConstants.selectSportEventDiscipline);
 		List<String>sportList=query.list();
 		Set<String>sportSet=new HashSet<String>();
 		sportSet.addAll(sportList);
@@ -135,7 +136,7 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 		LOG.info("retriving discipline list");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
-		Query query=session.createQuery("select discipline from OlympicEventDiscipline where sport= :sport");
+		Query query=session.createQuery(SqlConstants.selectDiscipline);
 		query.setParameter("sport", sport);
 		List<String>disciplineList=query.list();
 		Set<String>disciplineSet=new HashSet<String>();
@@ -144,10 +145,9 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 	}
 	public Set<String> retrieveEventList(String sport,String discipline) {
 		LOG.info("retriving event list");
-		System.out.println("sport disp entered");
 		SessionFactory factory=getFactory();
 		Session session=factory.openSession();
-		Query query=session.createQuery("select event from OlympicEventDiscipline where sport= :sport and discipline=:discipline");
+		Query query=session.createQuery(SqlConstants.selectEvent);
 		query.setParameter("sport", sport);
 		query.setParameter("discipline", discipline);
 		List<String>eventList=query.list();
@@ -170,7 +170,7 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 
 		try
 		{
-		Query query=session.createQuery("select eventId from OlympicEventDiscipline where sport=:sport and discipline=:discipline and event=:event");
+		Query query=session.createQuery(SqlConstants.selectEventId);
 		query.setParameter("sport",record.getSport());
 		query.setParameter("discipline", record.getDiscipline());
 		query.setParameter("event", record.getEvent());
@@ -206,13 +206,13 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 		copyObject.copyObject(record, event);
 		OlympicHost host=new OlympicHost();
 		
-		Query query=session.createQuery("select eventId from OlympicEventDiscipline where sport=:sport and discipline=:discipline and event=:event");
+		Query query=session.createQuery(SqlConstants.selectEventId);
 		query.setParameter("sport",record.getSport());
 		query.setParameter("discipline", record.getDiscipline());
 		query.setParameter("event", record.getEvent());
 		int eventId=(int)query.uniqueResult();
 		
-		query=session.createQuery("select athlete from OlympicAthlete where eventId=:eventId and country=:country and gender=:gender and medal=:medal and year=:year and display=:display");
+		query=session.createQuery(SqlConstants.selectAthlete);
 		query.setParameter("eventId", eventId);
 		query.setParameter("country", record.getCountry());
 		query.setParameter("gender", record.getGender());
@@ -221,7 +221,7 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 		query.setParameter("display","1");
 		List<String>athleteName=query.list();
 		
-		query=session.createQuery("select city from OlympicHost where year=:year");
+		query=session.createQuery(SqlConstants.selectCity);
 		query.setParameter("year",record.getYear());
 		String city=(String)query.uniqueResult();
 		List<OlympicDataPojo>displayList=new ArrayList<OlympicDataPojo>();
@@ -250,14 +250,14 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 		OlympicHost host=new OlympicHost();
 		try{
 			
-		Query query=session.createQuery("select eventId from OlympicEventDiscipline where sport=:sport and discipline=:discipline and event=:event");
+		Query query=session.createQuery(SqlConstants.selectEventId);
 		query.setParameter("sport",record.getSport());
 		query.setParameter("discipline", record.getDiscipline());
 		query.setParameter("event", record.getEvent());
 		int eventId=(int)query.uniqueResult();
 		if(operation.equalsIgnoreCase("delete"))
 		{
-			query=session.createQuery("update OlympicAthlete set display=:display where athlete=:athlete and eventId=:eventId and country=:country and gender=:gender and medal=:medal and year=:year");
+			query=session.createQuery(SqlConstants.updateAthlete);
 			query.setParameter("display","0");
 			query.setParameter("athlete",name);
 			query.setParameter("eventId", eventId);
@@ -272,7 +272,7 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 		}
 		else
 		{
-			query=session.createQuery("update OlympicAthlete set athlete=:athlete where athlete=:oldathlete and eventId=:eventId and country=:country and gender=:gender and medal=:medal and year=:year and display=:display");
+			query=session.createQuery(SqlConstants.updateSetAthlete);
 			query.setParameter("athlete",operation);
 			query.setParameter("oldathlete", name);
 			query.setParameter("eventId", eventId);
@@ -286,7 +286,7 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 			transaction.commit();
 		}
 		
-		query=session.createQuery("from OlympicAthlete where eventId=:eventId and country=:country and gender=:gender and medal=:medal and year=:year and display=:display");
+		query=session.createQuery(SqlConstants.fromAthlete);
 		query.setParameter("eventId", eventId);
 		query.setParameter("country", record.getCountry());
 		query.setParameter("gender", record.getGender());
@@ -379,7 +379,7 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 	    		FileWriter fw=new FileWriter("D:\\FilteredOlympicData.txt");    
 		           for(OlympicDataPojo record:filteredData)
 		           {
-		        	   String readRecord=record.getYear()+","+record.getCity()+","+record.getSport()+","+record.getDiscipline()+","+record.getAthlete()+","+record.getCountry()+","+record.getGender()+","+record.getEvent()+","+record.getMedal();
+		        	   String readRecord=record.getYear()+","+record.getCity()+","+record.getSport()+","+record.getDiscipline()+","+record.getAthlete()+","+record.getCountry()+","+record.getGender()+","+record.getEvent()+","+record.getMedal()+"\n";
 		        	   fw.write(readRecord);    
 		           }
 		           result=true;

@@ -123,7 +123,6 @@ public String updateOperation(@ModelAttribute("add")OlympicDataPojo olympicData,
 	List<OlympicDataPojo>disp=olympicService.displayRecord(olympicData);
 	//OlympicAthletes athletes=new OlympicAthletes();
 	//athletes.setAthletes(disp);
-	disp.forEach(System.out::println);
 	model.addAttribute("displayList",disp);
 	return "UpdatePage";	
 } 

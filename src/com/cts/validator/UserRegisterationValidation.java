@@ -30,6 +30,17 @@ public class UserRegisterationValidation {
 				errors.rejectValue("username", "error.username",
 						"Invalid User Name");
 			}
+			String email=userTo.getEmail();
+			int indexOfA=email.indexOf("@");
+			int dotIndex=email.lastIndexOf(".");
+			if(indexOfA<1 || dotIndex<indexOfA+2 || dotIndex+2>=email.length())
+			{
+			       errors.rejectValue("email", "error.email","Invalid Email");
+			}
+			if(userTo.getPhoneNumber().length()!=10)
+			{
+				 errors.rejectValue("phoneNumber", "error.phoneNumber","Invalid PhoneNumber");
+			}
 		}
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password",
 				"error.password", "*Password is required");

@@ -19,7 +19,7 @@
 <input type="submit" value="submit"/> </h4>
 <br>
 <br>
-<a href="AdminWelcomePage.jsp">BACK</a>
+<a href="AdminWelcomePage">BACK</a>
 </form>
 </body>
 </html>
