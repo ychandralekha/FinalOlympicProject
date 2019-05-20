@@ -297,8 +297,11 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 		List<OlympicDataPojo>athleteName=new ArrayList<OlympicDataPojo>();
 		for(OlympicAthlete olympicAthlete:athleteList)
 		{
-			record.setAthlete(olympicAthlete.getAthlete());
-			athleteName.add(record);
+			OlympicDataPojo records=new OlympicDataPojo();
+			System.out.println(record);
+			copyObject.copyObject(record, records);
+			records.setAthlete(olympicAthlete.getAthlete());
+			athleteName.add(records);
 		}
 		return athleteName;
 	}
@@ -379,8 +382,9 @@ public class OlympicDaoImplementation extends AbstractFactory implements IUserOp
 	    		FileWriter fw=new FileWriter("D:\\FilteredOlympicData.txt");    
 		           for(OlympicDataPojo record:filteredData)
 		           {
-		        	   String readRecord=record.getYear()+","+record.getCity()+","+record.getSport()+","+record.getDiscipline()+","+record.getAthlete()+","+record.getCountry()+","+record.getGender()+","+record.getEvent()+","+record.getMedal()+"\n";
+		        	   String readRecord=record.getYear()+","+record.getCity()+","+record.getSport()+","+record.getDiscipline()+","+record.getAthlete()+","+record.getCountry()+","+record.getGender()+","+record.getEvent()+","+record.getMedal();
 		        	   fw.write(readRecord);    
+		        	   fw.write(System.getProperty("line.separator"));
 		           }
 		           result=true;
 		           fw.close();

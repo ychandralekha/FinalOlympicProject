@@ -1,6 +1,8 @@
 package com.cts.controller;
 
 //import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ResourceBundle;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -49,6 +51,10 @@ public class OlympicController {
 	@RequestMapping(value = "/OlympicController", method = RequestMethod.POST)
 	public String validateUser(@ModelAttribute("user") OlympicUserPojo user,
 			BindingResult result, ModelMap model,HttpServletRequest request) {
+		
+		ResourceBundle admin=ResourceBundle.getBundle("admin");
+		String userAdmin=admin.getString("username");
+		String passwordAdmin=admin.getString("password");
 		HttpSession session=request.getSession();
 		LOG.info("Login Page");
 		userValidate.validate(user, result);
@@ -56,7 +62,7 @@ public class OlympicController {
 			return "Login";
 		}
 		session.setAttribute("userName", user.getUsername());
-		if(user.getUsername().equalsIgnoreCase("ycl") && user.getPassword().equalsIgnoreCase("1234"))
+		if(user.getUsername().equalsIgnoreCase(userAdmin) && user.getPassword().equalsIgnoreCase(passwordAdmin))
 			return "AdminWelcomePage";
 		else
 		{

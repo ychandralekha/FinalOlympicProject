@@ -72,26 +72,40 @@ public ModelAndView registerUser(@RequestParam("radioSelect")String pageDirect,M
 }  
 
 @RequestMapping(value= "/adminApproval",method = RequestMethod.POST)
-public String validateUserRegisteration(@RequestParam("approve")String[] approveUser,ModelMap model)
+public String validateUserRegisteration(@RequestParam(value="approve",required=false)String[] approveUser,ModelMap model,HttpServletRequest request)
 {
 	OlympicService olympicService=new OlympicService();
 	String pageDirect="";
+	if(approveUser!=null){
 	boolean result=olympicService.approveUser(approveUser);
 	if(result==true)
 		pageDirect="AdminApprovalPage";
 	else
 		pageDirect="AdminWelcomePage";
+	}
+	else
+	{
+		request.setAttribute("error","No Approvals to process...please go back!");
+		return "AdminApprovalPage";
+	}
 	LOG.info("Admin operations");
 	return pageDirect;
 }
 
 @RequestMapping(value = "/uploadfile", method = RequestMethod.POST)
 public String handleFileUpload(HttpServletRequest request,
-        @RequestParam("file") String fileUpload) throws Exception {
+        @RequestParam("file") String fileUpload) throws OlympicException {
 		FileParse file=new FileParse();
-		 List<OlympicDataPojo>list=file.parseData(fileUpload);
+		 List<OlympicDataPojo> list;
+		try {
+			list = file.parseData(fileUpload);
+		
 		OlympicService olympicService=new OlympicService();
 		olympicService.upload(list);
+		} catch (OlympicException e) {
+			request.setAttribute("error", e.getMessage());
+			return "AdminUpload";
+		}
 		LOG.info("After upload");
 			return "AdminWelcomePage";
     }
@@ -103,7 +117,7 @@ public String afterPopulating(@ModelAttribute("add")OlympicDataPojo olympicData,
 	try {
 		olympicService.insertRecord(olympicData);
 	} catch (OlympicException e) {
-		request.setAttribute("error",e);
+		request.setAttribute("error",e.getMessage());
 		
 		e.printStackTrace();
 	}
@@ -174,7 +188,7 @@ try{
 	model.addAttribute("add", new OlympicDataPojo());
 }catch(OlympicException e)
 {
-	request.setAttribute("error", e);
+	request.setAttribute("error", e.getMessage());
 }
 	return "UpdatePage";	
 } 
@@ -200,7 +214,7 @@ public String downloadRecord(HttpServletRequest request)
 	try {
 		olympicService.filterDisplay(filteredData);
 	} catch (OlympicException e) {
-		request.setAttribute("error",e);
+		request.setAttribute("error",e.getMessage());
 	}
 	session.removeAttribute("fullQuery");
     return "SearchFilter";

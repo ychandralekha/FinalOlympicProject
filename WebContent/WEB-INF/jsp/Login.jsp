@@ -27,6 +27,8 @@ function S_click(){
 <table align="center" cellspacing="10">
 
 <tr><td><a href="Register">New User?</a></td></tr>
+<br><br>
+<tr><br><br><br><br></tr>
 <tr><td>Username: </td>
 <td><form:input path="username"/>
 <form:errors path="username"  cssClass="error"/></td></tr>
